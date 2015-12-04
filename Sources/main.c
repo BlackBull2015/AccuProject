@@ -45,10 +45,44 @@
 // Buffer store data to send to slave
 uint8_t txBuff[DATA_LENGTH] = {0};
 // Buffer store data to receive from slave
-uint8_t rxBuff[1] = {0};
+uint8_t rxBuff[13] = {0};
+uint8_t mockData[1] = {0x00};
+uint8_t mockData2[1] = {0x00};
 
 //Test Register for who am i
 uint8_t WHO_AM_I[1] = {0x0D};
+
+//Read Register Data status
+uint8_t READ_DATA[1] = {0x00};
+
+
+//Register Addresses
+uint8_t ACCU_CTR_1[1] = {0x2A};
+uint8_t MAG_CTR_1[1] = {0x5B};
+uint8_t MAG_CTR_2[1] = {0x5C};
+uint8_t XYZ_DATA_REG[1] = {0x0F};
+
+
+
+//Config Register Values
+//Standby Mode
+uint8_t STN_ON[1] = {0x00};
+uint8_t STN_OFF[1] = {0x0D};
+//Mag
+uint8_t MAG_REG_1[1] = {0x1F};
+uint8_t MAG_REG_2[1] = {0x20};
+//XYZ data set
+uint8_t XYZ_DATA[1] = {0x01};
+
+
+
+uint8_t mock1 = {0x6D};
+uint8_t mock2 = {0x6E};
+uint8_t mock3 = {0x6F};
+uint8_t mock4 = {0x70};
+uint8_t mock5 = {0x71};
+uint8_t mock6 = {0x72};
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,6 +90,22 @@ uint8_t WHO_AM_I[1] = {0x0D};
 ///////////////////////////////////////////////////////////////////////////////
 int main(void)
 {
+	//Accu redings
+	int x;
+	int y;
+	int z;
+	//Mag redings
+	int mx;
+	int my;
+	int mz;
+//	int16_t refx;
+//	int16_t refy;
+//	int16_t refz;
+
+int magnet;
+
+
+
     // Number byte data will be transfer
     uint32_t count = 0;
     uint32_t i = 0;
@@ -73,6 +123,9 @@ int main(void)
 
     //Init ports for I2C 0
     i2cinitreg();
+
+
+
 
 
     // Initialize OSA
@@ -93,6 +146,86 @@ int main(void)
      I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,WHO_AM_I, 1, rxBuff, 1, 1000);
      //Prints out values in recived register
      PRINTF("\n\rWho am i register value is: %01X", rxBuff[0]);
+
+
+//Configuring accu and magnetomer
+     PRINTF("\rConfiguring Accu\n");
+ 	//Stendby On
+ 	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,ACCU_CTR_1, 1, STN_ON, 1, 1000);
+ 	PRINTF("\rStendby\n");
+ 	//Setting Mag reg
+ 	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MAG_CTR_1, 1, MAG_REG_1, 1, 1000);
+ 	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MAG_CTR_2, 1, MAG_REG_2, 1, 1000);
+ 	PRINTF("\rMag done\n");
+ 	//Setting Data
+ 	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,XYZ_DATA_REG, 1, XYZ_DATA, 1, 1000);
+ 	PRINTF("\rxyz done\n");
+
+
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock1, 1, mockData, 1, 1000);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock2, 1, mockData, 1, 1000);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock3, 1, mockData, 1, 1000);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock4, 1, mockData, 1, 1000);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock5, 1, mockData, 1, 1000);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock6, 1, mockData, 1, 1000);
+
+
+
+ 	//Standby off
+ 	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,ACCU_CTR_1, 1, STN_OFF, 1, 1000);
+ 	PRINTF("\rstandby off\n");
+
+ 	//Reding Mock registers
+
+
+
+
+
+
+//
+// 	PRINTF("\r\ngetting ref values");
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock1, 1, mockData, 1, 1000);
+// 	PRINTF("\n\rRef is: %01X", mockData[0]);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock2, 1, mockData2, 1, 1000);
+// 	PRINTF("\n\rRef is: %01X", mockData2[0]);
+// 	refx = (int16_t)(mockData[0]<<8 | mockData2[0]);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock3, 1, mockData, 1, 1000);
+// 	PRINTF("\n\rRef is: %01X", mockData[0]);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock4, 1, mockData2, 1, 1000);
+// 	PRINTF("\n\rRef is: %01X", mockData2[0]);
+// 	refy = (int16_t)(mockData[0]<<8 | mockData2[0]);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock5, 1, mockData, 1, 1000);
+// 	PRINTF("\n\rRef is: %01X", mockData[0]);
+// 	I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,mock6, 1, mockData2, 1, 1000);
+// 	PRINTF("\n\rRef is: %01X\n", mockData2[0]);
+// 	refz = (int16_t)(mockData[0]<<8 | mockData2[0]);
+
+ 	//PRINTF("\n\rRef is: %i %i %i\n", (int)refx, (int)refy, (int)refz);
+
+
+
+  //   configureAccuAndMag();
+
+     while(1){
+
+    	 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
+
+    	 x = (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
+    	 y = (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
+    	 z = (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
+    	 // copy the magnetometer byte data into 16 bit words
+    	 mx = (int16_t)((rxBuff[7] << 8) | rxBuff[8]);
+    	 my = (int16_t)((rxBuff[9] << 8) | rxBuff[10]);
+    	 mz = (int16_t)((rxBuff[11] << 8) | rxBuff[12]);
+    	// magnet = (int)(sqrt(pow((mx- (int)refx),2)+pow((my- (int)refy),2)+pow((mz- (int)refz),2)))/10;
+    	 magnet = (int)(sqrt(pow(mx,2)+pow(my,2)+pow(mz,2)))/10;
+
+    	// PRINTF("\rAccu is: x=%i y=%i z=%i  Max is: x=%i y= =%i z=%i ",x,y,z,mx,my,mz);
+    	 PRINTF("\rAccu is: x=%06i y=%06i z=%06i  Max is: %06i",x,y,z,magnet);
+
+
+
+     }
 
 
 ////    while(1)
@@ -127,6 +260,22 @@ void i2cinitreg(){
     PORTE_PCR24 |= (0x05u)<<8 | 0x03u;
     PORTE_PCR25 |= (0x05u)<<8 | 0x03u;
 }
+
+void configureAccuAndMag(device){
+
+	//Stendby On
+	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,ACCU_CTR_1, 1, STN_ON, 1, 1000);
+	//Setting Mag reg
+	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MAG_CTR_1, 1, MAG_REG_1, 1, 1000);
+	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MAG_CTR_2, 1, MAG_REG_2, 1, 1000);
+	//Setting Data
+	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,XYZ_DATA_REG, 1, XYZ_DATA, 1, 1000);
+	//Standby off
+	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,ACCU_CTR_1, 1, STN_OFF, 1, 1000);
+
+
+}
+
 
 /*******************************************************************************
  * EOF
