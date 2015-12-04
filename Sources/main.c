@@ -41,6 +41,7 @@
 
 #define DATA_LENGTH 1
 #define I2C_INSTANCE_0 0
+#define TRESHOLD 200
 
 // Buffer store data to send to slave
 uint8_t txBuff[DATA_LENGTH] = {0};
@@ -98,6 +99,7 @@ int main(void)
 	int mx;
 	int my;
 	int mz;
+	int countl;
 //	int16_t refx;
 //	int16_t refy;
 //	int16_t refz;
@@ -208,20 +210,36 @@ int magnet;
 
      while(1){
 
-    	 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
+    	 x = 0;
+    	 y = 0;
+    	 z = 0;
+    	 for(countl = 0; countl < 200; countl++){
+    		 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
 
-    	 x = (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
-    	 y = (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
-    	 z = (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
-    	 // copy the magnetometer byte data into 16 bit words
-    	 mx = (int16_t)((rxBuff[7] << 8) | rxBuff[8]);
-    	 my = (int16_t)((rxBuff[9] << 8) | rxBuff[10]);
-    	 mz = (int16_t)((rxBuff[11] << 8) | rxBuff[12]);
-    	// magnet = (int)(sqrt(pow((mx- (int)refx),2)+pow((my- (int)refy),2)+pow((mz- (int)refz),2)))/10;
-    	 magnet = (int)(sqrt(pow(mx,2)+pow(my,2)+pow(mz,2)))/10;
+    		     	 x += (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
+    		     	 y += (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
+    		     	 z += (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
+    	 }
+    	 x = x/200;
+    	 y = y/200;
+
+//
+//    	 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
+//
+//    	 x = (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
+//    	 y = (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
+//    	 z = (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
+//    	 // copy the magnetometer byte data into 16 bit words
+//    	 mx = (int16_t)((rxBuff[7] << 8) | rxBuff[8]);
+//    	 my = (int16_t)((rxBuff[9] << 8) | rxBuff[10]);
+//    	 mz = (int16_t)((rxBuff[11] << 8) | rxBuff[12]);
+//    	// magnet = (int)(sqrt(pow((mx- (int)refx),2)+pow((my- (int)refy),2)+pow((mz- (int)refz),2)))/10;
+//    	 magnet = (int)(sqrt(pow(mx,2)+pow(my,2)+pow(mz,2)))/10;
 
     	// PRINTF("\rAccu is: x=%i y=%i z=%i  Max is: x=%i y= =%i z=%i ",x,y,z,mx,my,mz);
-    	 PRINTF("\rAccu is: x=%06i y=%06i z=%06i  Max is: %06i",x,y,z,magnet);
+    //	 PRINTF("\rAccu is: x=%06i y=%06i z=%06i  Max is: %06i",x,y,z,magnet);
+    	 getWhere(x,y);
+
 
 
 
@@ -260,6 +278,49 @@ void i2cinitreg(){
     PORTE_PCR24 |= (0x05u)<<8 | 0x03u;
     PORTE_PCR25 |= (0x05u)<<8 | 0x03u;
 }
+
+
+void getWhere(int x, int y){
+//	TRESHOLD
+
+
+	PRINTF("\rAccu is: x=%06i y=%06i  ",x,y);
+
+	if(x<0-TRESHOLD || y<0-TRESHOLD || x>0+TRESHOLD || y>0+TRESHOLD){
+
+	if(y>0+TRESHOLD){
+		PRINTF("RIGHT ");
+	}else if(y<0-TRESHOLD){
+		PRINTF("LEFT ");
+	}
+
+	if(x>0+TRESHOLD){
+		PRINTF(" BACK ");
+	}else if(x<0-TRESHOLD){
+		PRINTF(" FRONT ");
+	}
+
+
+//	if(x<0-TRESHOLD && y<0-TRESHOLD){
+//		PRINTF("+ FRONT LEFT");
+//	}else if (x<0-TRESHOLD && y>0+TRESHOLD){
+//		PRINTF("+ FRONT RIGHT");
+//	}else if (x>0+TRESHOLD && y<0-TRESHOLD){
+//		PRINTF("+ BACK LEFT");
+//	}else if (x>0+TRESHOLD && y>0+TRESHOLD){
+//		PRINTF("+ BACK RIGHT");
+//	}
+
+
+	}
+	PRINTF("                 ");
+
+//	PRINTF("\r                                             \r");
+
+
+
+}
+
 
 void configureAccuAndMag(device){
 
