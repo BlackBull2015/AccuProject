@@ -39,78 +39,119 @@
 #include "fsl_i2c_master_driver.h"
 #include "fsl_debug_console.h"
 #include "Accu.h"
+#include "fsl_uart_hal.h"
+#include "fsl_uart_driver.h"
+//#include "fsl_uart.h"
 
-
+char AT[]="AT";
+uint8_t TXBUFF[2];
 ///////////////////////////////////////////////////////////////////////////////
 // Code
 ///////////////////////////////////////////////////////////////////////////////
+
+void UART2_IRQHandler(void)
+{
+	UART_DRV_IRQHandler(2);
+}
 int main(void)
 {
-	//Accu redings
-	int x,y,z,count, magnet;
+	 // Init hardware
+	uart_state_t uartState; // user provides memory for the driver state structure
+	uart_user_config_t uartConfig;
 
-    // i2c master state
-    i2c_master_state_t master;
-    // i2c device configuration
-    i2c_device_t device =
-    {
-      .address = 0x1DU,
-      .baudRate_kbps = 400   // 400 Kbps
-    };
-
-    // Init hardware
-    hardware_init();
-
-    //Init ports for I2C 0
-    i2cinitreg();
-
-    // Initialize OSA
-    OSA_Init();
-
-    PRINTF("\r\n==================== I2C MASTER BLOCKING ===================\r\n");
-    PRINTF("\r\n1. Master checks who am i register\
-    \r\n2. Master configures accelerometer and magnetometer\
-    \r\n3. Takes 200 samples, average them and displays results\r\n");
-    PRINTF("\r\n============================================================\r\n\n");
+	hardware_init();
+	configure_uart_pins(1);
 
 
-    // Initialize i2c master
-    I2C_DRV_MasterInit(I2C_INSTANCE_0, &master);
-    PRINTF("Press any key to start transfer:\r\n\n");
-    GETCHAR();
+	 OSA_Init();
 
 
-    // Master Sends command of register it wasn't to read and return is saved inside rxBuff
-     I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,WHO_AM_I, 1, rxBuff, 1, 1000);
-     //Prints out values in recived register
-     PRINTF("\n\rWho am i register value is: %01X", rxBuff[0]);
+	uartConfig.baudRate = 9600;
+	uartConfig.bitCountPerChar = kUart8BitsPerChar;
+	uartConfig.parityMode = kUartParityDisabled;
+	uartConfig.stopBitCount = kUartOneStopBit;
+
+PRINTF("Just to init Uart\r");
+	UART_DRV_Init(2,  &uartState, &uartConfig);
+	PRINTF("Uart initilized\n\r");
+
+	while(1){
+		PRINTF("About to send data\n\r");
+UART_DRV_SendDataBlocking(2, AT, sizeof(AT),16000u); // function
+//	UART_DRV_ReceiveDataBlocking(2, &TXBUFF, 2,16000); // function
+//	 PRINTF("\n\rWho am i register value is: %01X", TXBUFF[0]);
+
+	//PRINTF()
+	PRINTF("Tried to sent some\n");
+
+	}
 
 
-     configureAccuAndMag(device);
-
-     while(1){
-
-    	 x = 0;
-    	 y = 0;
-    	 z = 0;
-    	 for(count = 0; count < 200; count++){
-    		 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
-
-    		     	 x += (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
-    		     	 y += (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
-    		     	 z += (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
-    	 }
-    	 x = x/200;
-    	 y = y/200;
-    	 getWhere(x,y);
-     }
-
-    PRINTF("\r\n==================== I2C MASTER FINISH =================== \r\n");
-
-    // Deinit i2c
-    I2C_DRV_MasterDeinit(0);
-
-    return 0;
+//	//Accu redings
+//	int x,y,z,count, magnet;
+//
+//    // i2c master state
+//    i2c_master_state_t master;
+//    // i2c device configuration
+//    i2c_device_t device =
+//    {
+//      .address = 0x1DU,
+//      .baudRate_kbps = 400   // 400 Kbps
+//    };
+//
+//    // Init hardware
+//    hardware_init();
+//
+//    //Init ports for I2C 0
+//    i2cinitreg();
+//
+//    // Initialize OSA
+//    OSA_Init();
+//
+//    PRINTF("\r\n==================== I2C MASTER BLOCKING ===================\r\n");
+//    PRINTF("\r\n1. Master checks who am i register\
+//    \r\n2. Master configures accelerometer and magnetometer\
+//    \r\n3. Takes 200 samples, average them and displays results\r\n");
+//    PRINTF("\r\n============================================================\r\n\n");
+//
+//
+//    // Initialize i2c master
+//    I2C_DRV_MasterInit(I2C_INSTANCE_0, &master);
+//    PRINTF("Press any key to start transfer:\r\n\n");
+//    GETCHAR();
+//
+//
+//    // Master Sends command of register it wasn't to read and return is saved inside rxBuff
+//     I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,WHO_AM_I, 1, rxBuff, 1, 1000);
+//     //Prints out values in recived register
+//     PRINTF("\n\rWho am i register value is: %01X", rxBuff[0]);
+//
+//
+//     configureAccuAndMag(device);
+//
+//     while(1){
+//
+//    	 x = 0;
+//    	 y = 0;
+//    	 z = 0;
+//    	 for(count = 0; count < 200; count++){
+//    		 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
+//
+//    		     	 x += (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
+//    		     	 y += (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
+//    		     	 z += (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
+//    	 }
+//    	 x = x/200;
+//    	 y = y/200;
+//    	 getWhere(x,y);
+//     }
+//
+//    PRINTF("\r\n==================== I2C MASTER FINISH =================== \r\n");
+//
+//    // Deinit i2c
+//    I2C_DRV_MasterDeinit(0);
+//
+//    return 0;
 }
 
 void i2cinitreg(){

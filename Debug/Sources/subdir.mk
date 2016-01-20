@@ -4,16 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Sources/fsl_i2c_irq.c \
-../Sources/main.c 
+../Sources/Uart2.c \
+../Sources/fsl_i2c_irq.c 
 
 OBJS += \
-./Sources/fsl_i2c_irq.o \
-./Sources/main.o 
+./Sources/Uart2.o \
+./Sources/fsl_i2c_irq.o 
 
 C_DEPS += \
-./Sources/fsl_i2c_irq.d \
-./Sources/main.d 
+./Sources/Uart2.d \
+./Sources/fsl_i2c_irq.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
