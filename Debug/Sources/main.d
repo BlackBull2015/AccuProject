@@ -1,4 +1,4 @@
-Sources/Uart2.o: ../Sources/Uart2.c \
+Sources/main.o: ../Sources/main.c \
  D:/Project/Lab_template_v01/Board/board.h \
  D:/Project/Lab_template_v01/Board/pin_mux.h \
  D:/Project/Lab_template_v01/Board/gpio_pins.h \
@@ -20,7 +20,7 @@ Sources/Uart2.o: ../Sources/Uart2.c \
  C:\Freescale\KSDK_1.2.0\platform\drivers\inc/fsl_i2c_master_driver.h \
  C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_i2c_hal.h \
  C:\Freescale\KSDK_1.2.0/platform/utilities/inc/fsl_debug_console.h \
- ../Sources/Accu.h \
+ ../Sources/Accu2.h \
  C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_uart_hal.h \
  C:\Freescale\KSDK_1.2.0\platform\drivers\inc/fsl_uart_driver.h
 
@@ -66,7 +66,7 @@ C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_i2c_hal.h:
 
 C:\Freescale\KSDK_1.2.0/platform/utilities/inc/fsl_debug_console.h:
 
-../Sources/Accu.h:
+../Sources/Accu2.h:
 
 C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_uart_hal.h:
 

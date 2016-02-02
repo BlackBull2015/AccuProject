@@ -1,19 +1,19 @@
 /*
  * Accu.h
  *
- *  Created on: Dec 4, 2015
+ *  Created on: Feb 2, 2016
  *      Author: Eric
  */
 
 #ifndef SOURCES_ACCU_H_
 #define SOURCES_ACCU_H_
 
-
-
-
 #define DATA_LENGTH 13
 #define I2C_INSTANCE_0 0
 #define TRESHOLD 200
+
+void i2cinitreg();
+void getWhere(int x, int y);
 
 
 // Buffer store data to send to slave

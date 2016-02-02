@@ -38,7 +38,7 @@
 #include "fsl_os_abstraction.h"
 #include "fsl_i2c_master_driver.h"
 #include "fsl_debug_console.h"
-#include "Accu.h"
+#include "Accu2.h"
 #include "fsl_uart_hal.h"
 #include "fsl_uart_driver.h"
 //#include "fsl_uart.h"
@@ -55,36 +55,40 @@ void UART2_IRQHandler(void)
 }
 int main(void)
 {
-	 // Init hardware
-	uart_state_t uartState; // user provides memory for the driver state structure
-	uart_user_config_t uartConfig;
-
-	hardware_init();
-	configure_uart_pins(1);
 
 
-	 OSA_Init();
+//Simple UART2
 
-
-	uartConfig.baudRate = 9600;
-	uartConfig.bitCountPerChar = kUart8BitsPerChar;
-	uartConfig.parityMode = kUartParityDisabled;
-	uartConfig.stopBitCount = kUartOneStopBit;
-
-PRINTF("Just to init Uart\r");
-	UART_DRV_Init(2,  &uartState, &uartConfig);
-	PRINTF("Uart initilized\n\r");
-
-	while(1){
-		PRINTF("About to send data\n\r");
-UART_DRV_SendDataBlocking(2, AT, sizeof(AT),16000u); // function
-//	UART_DRV_ReceiveDataBlocking(2, &TXBUFF, 2,16000); // function
-//	 PRINTF("\n\rWho am i register value is: %01X", TXBUFF[0]);
-
-	//PRINTF()
-	PRINTF("Tried to sent some\n");
-
-	}
+//	 // Init hardware
+//	uart_state_t uartState; // user provides memory for the driver state structure
+//	uart_user_config_t uartConfig;
+//
+//	hardware_init();
+//	configure_uart_pins(1);
+//
+//
+//	 OSA_Init();
+//
+//
+//	uartConfig.baudRate = 9600;
+//	uartConfig.bitCountPerChar = kUart8BitsPerChar;
+//	uartConfig.parityMode = kUartParityDisabled;
+//	uartConfig.stopBitCount = kUartOneStopBit;
+//
+//PRINTF("Just to init Uart\r");
+//	UART_DRV_Init(2,  &uartState, &uartConfig);
+//	PRINTF("Uart initilized\n\r");
+//
+//	while(1){
+//		PRINTF("About to send data\n\r");
+//UART_DRV_SendDataBlocking(2, AT, sizeof(AT),16000u); // function
+////	UART_DRV_ReceiveDataBlocking(2, &TXBUFF, 2,16000); // function
+////	 PRINTF("\n\rWho am i register value is: %01X", TXBUFF[0]);
+//
+//	//PRINTF()
+//	PRINTF("Tried to sent some\n");
+//
+//	}
 
 
 //	//Accu redings

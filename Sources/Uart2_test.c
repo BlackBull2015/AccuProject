@@ -41,7 +41,23 @@
 #include "Accu.h"
 #include "fsl_uart_hal.h"
 #include "fsl_uart_driver.h"
+#include "fsl_clock_manager.h"
 //#include "fsl_uart.h"
+
+void enable_UART2_receive_interrupt();
+void UART2_config(unsigned int BAUD_RATE);
+void put_char(char c);
+
+
+/*
+ * UART2 Interrupt Handler
+ * Echos received character
+ */
+void UART2_IRQHandler(void)
+{
+    if(UART2_S1 & UART_S1_RDRF_MASK)
+    	PUTCHAR(UART2_D);
+}
 
 char AT[]="AT";
 uint8_t TXBUFF[2];
@@ -49,10 +65,7 @@ uint8_t TXBUFF[2];
 // Code
 ///////////////////////////////////////////////////////////////////////////////
 
-void UART2_IRQHandler(void)
-{
-	UART_DRV_IRQHandler(2);
-}
+
 
 int main(void)
 {
@@ -61,30 +74,64 @@ int main(void)
 	uart_user_config_t uartConfig;
 
 	hardware_init();
-	configure_uart_pins(1);
+	UART2_config(9600);
+	enable_UART2_receive_interrupt();
 
-
-	 OSA_Init();
-
-
-	uartConfig.baudRate = 9600;
-	uartConfig.bitCountPerChar = kUart8BitsPerChar;
-	uartConfig.parityMode = kUartParityDisabled;
-	uartConfig.stopBitCount = kUartOneStopBit;
-
-PRINTF("Just to init Uart\r");
-	UART_DRV_Init(2,  &uartState, &uartConfig);
-	PRINTF("Uart initilized\n\r");
-
+	PRINTF("About to send data\n\r");
 	while(1){
-		PRINTF("About to send data\n\r");
-UART_DRV_SendDataBlocking(2, AT, sizeof(AT),16000u); // function
-	PRINTF("Tried to sent some\n");
+
+		put_char('A');
+		for(int x=0;x<1000;x++);
+
 	}
 
 
 return 0;
 }
+
+//Function to configure UART2
+void UART2_config(unsigned int BAUD_RATE)
+{
+	long int uart_clock, BR;
+	unsigned int SBR, OSR;
+	unsigned char temp;
+	//enable Port A and UART 0 clocks
+	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
+	SIM_SCGC4 |= SIM_SCGC4_UART2_MASK;
+	//configure UART 0 pins
+	configure_uart_pins(1);
+	//configure baud rate
+	uart_clock = CLOCK_SYS_GetBusClockFreq();
+	SBR = uart_clock/(16 * BAUD_RATE);
+	UART2_BDL = SBR & 0xFF;
+	UART2_BDH |= ((SBR & 0xFF00)>>8);
+	UART2_C1 = 0;
+	UART2_C2 |= 0x0C; //enable transmitter and receiver
+	UART2_C3 = 0;
+	//Function to configure UART2
+}
+
+void enable_UART2_receive_interrupt()
+{
+	//Configure NVIC
+	NVIC_ClearPendingIRQ(14);
+	NVIC_EnableIRQ(14);
+	UART2_C2 |= UART_C2_RIE_MASK;	//set RIE to enable receive interrupt
+}
+
+/*********************************************************************
+* Function to transmit a single character to the UART2 TXD pin
+* The function waits until the transmit buffer is empty before writing
+* to the date register.
+*/
+void put_char(char c)
+{
+	while((UART2_S1 & UART_S1_TDRE_MASK) == 0) //wait until tx buffer is empty
+	{}
+	UART2_D = c;
+}
+//********************************************************************
+
 
 /*******************************************************************************
  * EOF
