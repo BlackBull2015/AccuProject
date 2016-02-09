@@ -44,46 +44,44 @@
 #include "UART2_Interrupt.h"
 //#include "fsl_uart.h"
 
-//char AT[]="AT";
-//uint8_t TXBUFF[2];
 ///////////////////////////////////////////////////////////////////////////////
 // Code
 ///////////////////////////////////////////////////////////////////////////////
 
-//void UART2_IRQHandler(void)
+//void UART1_IRQHandler(void)
 //{
-//	UART_DRV_IRQHandler(2);
+//	UART_DRV_IRQHandler(1);
 //}
 int main(void)
 {
 
 
-//Simple UART2
+//Simple UART1
 
 //	 // Init hardware
-//	uart_state_t uartState; // user provides memory for the driver state structure
-//	uart_user_config_t uartConfig;
+//	uart_state_t uartState1; // user provides memory for the driver state structure
+//	uart_user_config_t uartConfig1;
 //
 //	hardware_init();
-//	configure_uart_pins(1);
+//	configure_uart_pins(0);
 //
 //
 //	 OSA_Init();
 //
 //
-//	uartConfig.baudRate = 9600;
-//	uartConfig.bitCountPerChar = kUart8BitsPerChar;
-//	uartConfig.parityMode = kUartParityDisabled;
-//	uartConfig.stopBitCount = kUartOneStopBit;
+//	uartConfig1.baudRate = 9600;
+//	uartConfig1.bitCountPerChar = kUart8BitsPerChar;
+//	uartConfig1.parityMode = kUartParityDisabled;
+//	uartConfig1.stopBitCount = kUartOneStopBit;
 //
 //PRINTF("Just to init Uart\r");
-//	UART_DRV_Init(2,  &uartState, &uartConfig);
+//	UART_DRV_Init(1,  &uartState1, &uartConfig1);
 //	PRINTF("Uart initilized\n\r");
 //
 //	while(1){
 //		PRINTF("About to send data\n\r");
-//UART_DRV_SendDataBlocking(2, AT, sizeof(AT),16000u); // function
-////	UART_DRV_ReceiveDataBlocking(2, &TXBUFF, 2,16000); // function
+//UART_DRV_SendDataBlocking(1, AT, sizeof(AT),16000u); // function
+////	UART_DRV_ReceiveDataBlocking(1, &TXBUFF, 2,16000); // function
 ////	 PRINTF("\n\rWho am i register value is: %01X", TXBUFF[0]);
 //
 //	//PRINTF()
@@ -92,27 +90,24 @@ int main(void)
 //	}
 
 
-	//Accu redings
-	int x,y,z,count, magnet;
-
-    // i2c master state
+	//Accu init
     i2c_master_state_t master;
-    // i2c device configuration
     i2c_device_t device =
     {
       .address = 0x1DU,
       .baudRate_kbps = 400   // 400 Kbps
     };
-
-    // Init hardware
     hardware_init();
     UART2_config(9600);
     enable_UART2_receive_interrupt();
-    //Init ports for I2C 0
     i2cinitreg();
 
     // Initialize OSA
     OSA_Init();
+
+    // Initialize i2c master
+    I2C_DRV_MasterInit(I2C_INSTANCE_0, &master);
+    configureAccuAndMag(device);
 
     PRINTF("\r\n==================== I2C MASTER BLOCKING ===================\r\n");
     PRINTF("\r\n1. Master checks who am i register\
@@ -120,20 +115,9 @@ int main(void)
     \r\n3. Takes 200 samples, average them and displays results\r\n");
     PRINTF("\r\n============================================================\r\n\n");
 
-
-    // Initialize i2c master
-    I2C_DRV_MasterInit(I2C_INSTANCE_0, &master);
     PRINTF("Press any key to start transfer:\r\n\n");
     GETCHAR();
 
-
-    // Master Sends command of register it wasn't to read and return is saved inside rxBuff
-     I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,WHO_AM_I, 1, rxBuff, 1, 1000);
-     //Prints out values in recived register
-     PRINTF("\n\rWho am i register value is: %01X", rxBuff[0]);
-
-
-     configureAccuAndMag(device);
 
      while(1){
 

@@ -12,8 +12,11 @@
 #define I2C_INSTANCE_0 0
 #define TRESHOLD 200
 
+
 void i2cinitreg();
 void getWhere(int x, int y);
+
+int x,y,z,count, magnet;
 
 
 // Buffer store data to send to slave
