@@ -38,40 +38,22 @@
 #include "fsl_os_abstraction.h"
 #include "fsl_i2c_master_driver.h"
 #include "fsl_debug_console.h"
-#include "Accu.h"
+#include "Accu2.h"
 #include "fsl_uart_hal.h"
 #include "fsl_uart_driver.h"
 #include "fsl_clock_manager.h"
+#include "UART2_Interrupt.h"
 //#include "fsl_uart.h"
 
-void enable_UART2_receive_interrupt();
-void UART2_config(unsigned int BAUD_RATE);
-void put_char(char c);
 
-
-/*
- * UART2 Interrupt Handler
- * Echos received character
- */
-void UART2_IRQHandler(void)
-{
-    if(UART2_S1 & UART_S1_RDRF_MASK)
-    	PUTCHAR(UART2_D);
-}
-
-char AT[]="AT";
-uint8_t TXBUFF[2];
 ///////////////////////////////////////////////////////////////////////////////
 // Code
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
 int main(void)
 {
 	 // Init hardware
-	uart_state_t uartState; // user provides memory for the driver state structure
-	uart_user_config_t uartConfig;
+//	uart_state_t uartState; // user provides memory for the driver state structure
+//	uart_user_config_t uartConfig;
 
 	hardware_init();
 	UART2_config(9600);
@@ -80,7 +62,7 @@ int main(void)
 	PRINTF("About to send data\n\r");
 	while(1){
 
-		put_char('A');
+	//	put_char('A');
 		for(int x=0;x<1000;x++);
 
 	}
@@ -89,7 +71,32 @@ int main(void)
 return 0;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// UART2 Interrupt Handler Echos received character
+///////////////////////////////////////////////////////////////////////////////
+void UART2_IRQHandler(void)
+{
+	int count,size;
+    if(UART2_S1 & UART_S1_RDRF_MASK){
+    	if(UART2_D != '\r')
+    		CommandBuffer[BufferStage++] = UART2_D;
+    	else{
+    		size = BufferStage;
+    		BufferStage = 0;
+    		for(count = 0;count < size; count ++){
+    			PUTCHAR(CommandBuffer[BufferStage++]);
+    		}
+    		BufferStage = 0;
+    		memset(CommandBuffer,0,sizeof(CommandBuffer));
+    	}
+    //	PUTCHAR(UART2_D);	//Test for sending all characters
+    }
+
+}
+///////////////////////////////////////////////////////////////////////////////
 //Function to configure UART2
+///////////////////////////////////////////////////////////////////////////////
 void UART2_config(unsigned int BAUD_RATE)
 {
 	long int uart_clock, BR;
@@ -110,28 +117,25 @@ void UART2_config(unsigned int BAUD_RATE)
 	UART2_C3 = 0;
 	//Function to configure UART2
 }
-
+///////////////////////////////////////////////////////////////////////////////
+// Configure NVIC
+///////////////////////////////////////////////////////////////////////////////
 void enable_UART2_receive_interrupt()
 {
-	//Configure NVIC
+
 	NVIC_ClearPendingIRQ(14);
 	NVIC_EnableIRQ(14);
 	UART2_C2 |= UART_C2_RIE_MASK;	//set RIE to enable receive interrupt
 }
-
-/*********************************************************************
-* Function to transmit a single character to the UART2 TXD pin
-* The function waits until the transmit buffer is empty before writing
-* to the date register.
-*/
+///////////////////////////////////////////////////////////////////////////////
+// Function to transmit a single character to the UART2 TXD pin
+///////////////////////////////////////////////////////////////////////////////
 void put_char(char c)
 {
 	while((UART2_S1 & UART_S1_TDRE_MASK) == 0) //wait until tx buffer is empty
 	{}
 	UART2_D = c;
 }
-//********************************************************************
-
 
 /*******************************************************************************
  * EOF
