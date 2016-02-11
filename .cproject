@@ -124,7 +124,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Sources/main_leds.c|Utilities/fsl_misc_utilities.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Sources/Uart2_test.c|Sources/Uart2.c|Sources/main_leds.c|Utilities/fsl_misc_utilities.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

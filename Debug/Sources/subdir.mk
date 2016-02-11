@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Sources/fsl_i2c_irq.c \
+../Sources/functions.c \
 ../Sources/main.c 
 
 OBJS += \
 ./Sources/fsl_i2c_irq.o \
+./Sources/functions.o \
 ./Sources/main.o 
 
 C_DEPS += \
 ./Sources/fsl_i2c_irq.d \
+./Sources/functions.d \
 ./Sources/main.d 
 
 

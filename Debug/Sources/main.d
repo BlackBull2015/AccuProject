@@ -19,7 +19,11 @@ Sources/main.o: ../Sources/main.c \
  C:\Freescale\KSDK_1.2.0\platform\osa\inc/fsl_os_abstraction_bm.h \
  C:\Freescale\KSDK_1.2.0\platform\drivers\inc/fsl_i2c_master_driver.h \
  C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_i2c_hal.h \
- C:\Freescale\KSDK_1.2.0/platform/utilities/inc/fsl_debug_console.h
+ C:\Freescale\KSDK_1.2.0/platform/utilities/inc/fsl_debug_console.h \
+ ../Sources/Accu2.h \
+ C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_uart_hal.h \
+ C:\Freescale\KSDK_1.2.0\platform\drivers\inc/fsl_uart_driver.h \
+ ../Sources/UART2_Interrupt.h
 
 D:/Project/Lab_template_v01/Board/board.h:
 
@@ -62,3 +66,11 @@ C:\Freescale\KSDK_1.2.0\platform\drivers\inc/fsl_i2c_master_driver.h:
 C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_i2c_hal.h:
 
 C:\Freescale\KSDK_1.2.0/platform/utilities/inc/fsl_debug_console.h:
+
+../Sources/Accu2.h:
+
+C:\Freescale\KSDK_1.2.0\platform\hal\inc/fsl_uart_hal.h:
+
+C:\Freescale\KSDK_1.2.0\platform\drivers\inc/fsl_uart_driver.h:
+
+../Sources/UART2_Interrupt.h:

@@ -27,37 +27,64 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+///////////////////////////////////////////////////////////////////////////////
+// Includes
+///////////////////////////////////////////////////////////////////////////////
 
-#include "fsl_i2c_shared_function.h"
-#include "fsl_device_registers.h"
+ // Standard C Included Files
+#include <stdio.h>
+// SDK Included Files
+#include "board.h"
+#include "fsl_os_abstraction.h"
+#include "fsl_i2c_master_driver.h"
+#include "fsl_debug_console.h"
+#include "Accu.h"
+#include "fsl_uart_hal.h"
+#include "fsl_uart_driver.h"
+//#include "fsl_uart.h"
 
-/*******************************************************************************
- * Code
- ******************************************************************************/
+char AT[]="AT";
+uint8_t TXBUFF[2];
+///////////////////////////////////////////////////////////////////////////////
+// Code
+///////////////////////////////////////////////////////////////////////////////
 
-#if (I2C_INSTANCE_COUNT > 0U)
-/* Implementation of I2C0 handler named in startup code. */
-void I2C0_IRQHandler(void)
+void UART2_IRQHandler(void)
 {
-    I2C_DRV_IRQHandler(I2C0_IDX);
+	UART_DRV_IRQHandler(2);
 }
-#endif
 
-#if (I2C_INSTANCE_COUNT > 1U)
-/* Implementation of I2C1 handler named in startup code. */
-void I2C1_IRQHandler(void)
+int main(void)
 {
-    I2C_DRV_IRQHandler(I2C1_IDX);
-}
-#endif
+	 // Init hardware
+	uart_state_t uartState; // user provides memory for the driver state structure
+	uart_user_config_t uartConfig;
 
-#if (I2C_INSTANCE_COUNT > 2U)
-/* Implementation of I2C2 handler named in startup code. */
-void I2C2_IRQHandler(void)
-{
-    I2C_DRV_IRQHandler(I2C2_IDX);
+	hardware_init();
+	configure_uart_pins(1);
+
+
+	 OSA_Init();
+
+
+	uartConfig.baudRate = 9600;
+	uartConfig.bitCountPerChar = kUart8BitsPerChar;
+	uartConfig.parityMode = kUartParityDisabled;
+	uartConfig.stopBitCount = kUartOneStopBit;
+
+PRINTF("Just to init Uart\r");
+	UART_DRV_Init(2,  &uartState, &uartConfig);
+	PRINTF("Uart initilized\n\r");
+
+	while(1){
+		PRINTF("About to send data\n\r");
+UART_DRV_SendDataBlocking(2, AT, sizeof(AT),16000u); // function
+	PRINTF("Tried to sent some\n");
+	}
+
+
+return 0;
 }
-#endif
 
 /*******************************************************************************
  * EOF
