@@ -1,7 +1,7 @@
 /*
- * Accu_Includes.h
+ * Accu.h
  *
- *  Created on: Feb 2, 2016
+ *  Created on: Feb 16, 2016
  *      Author: Eric
  */
 
@@ -50,7 +50,6 @@ uint8_t MAG_REG_1[1] = {0x1F};
 uint8_t MAG_REG_2[1] = {0x20};
 //XYZ data set
 uint8_t XYZ_DATA[1] = {0x01};
-
 
 
 
