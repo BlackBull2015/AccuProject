@@ -12,15 +12,14 @@
 #define I2C_INSTANCE_0 0
 #define TRESHOLD 200
 
-
+///////////////////////////////////////////////////////////////////////////////
+//Accelerometer configuration files
+///////////////////////////////////////////////////////////////////////////////
 void i2cinitreg();
 void getWhere(int x, int y);
 
 int x,y,z,count, magnet;
 
-
-// Buffer store data to send to slave
-//uint8_t txBuff[DATA_LENGTH] = {0};
 // Buffer store data to receive from slave
 uint8_t rxBuff[DATA_LENGTH] = {0};
 
@@ -31,15 +30,18 @@ uint8_t WHO_AM_I[1] = {0x0D};
 uint8_t READ_DATA[1] = {0x00};
 
 
-//Register Addresses
+///////////////////////////////////////////////////////////////////////////////
+// Register addresses
+///////////////////////////////////////////////////////////////////////////////
 uint8_t ACCU_CTR_1[1] = {0x2A};
 uint8_t MAG_CTR_1[1] = {0x5B};
 uint8_t MAG_CTR_2[1] = {0x5C};
 uint8_t XYZ_DATA_REG[1] = {0x0F};
 
 
-
-//Config Register Values
+///////////////////////////////////////////////////////////////////////////////
+// Config Register Values
+///////////////////////////////////////////////////////////////////////////////
 //Standby Mode
 uint8_t STN_ON[1] = {0x00};
 uint8_t STN_OFF[1] = {0x0D};
