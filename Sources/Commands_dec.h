@@ -42,5 +42,9 @@
 #define UNLOCK 31	//Unlock the device
 
 
+char left[] = "LEFT";
+char right[] = "RIGHT";
+char front[] = "FRONT";
+char back[] = "BACK";
 
 #endif

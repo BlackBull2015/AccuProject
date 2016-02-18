@@ -33,46 +33,8 @@ void UART1_IRQHandler(void)
 	UART_DRV_IRQHandler(1);
 }
 
-char left[] = "LEFT";
-char right[] = "RIGHT";
-char front[] = "FRONT";
-char back[] = "BACK";
 int main(void)
 {
-
-
-//Simple UART1
-
-//	 // Init hardware
-//	uart_state_t uartState1; // user provides memory for the driver state structure
-//	uart_user_config_t uartConfig1;
-//
-//	hardware_init();
-//	configure_uart_pins(0);
-//
-//
-//	 OSA_Init();
-//
-//
-//	uartConfig1.baudRate = 9600;
-//	uartConfig1.bitCountPerChar = kUart8BitsPerChar;
-//	uartConfig1.parityMode = kUartParityDisabled;
-//	uartConfig1.stopBitCount = kUartOneStopBit;
-//
-//PRINTF("Just to init Uart\r");
-//	UART_DRV_Init(1,  &uartState1, &uartConfig1);
-//	PRINTF("Uart initilized\n\r");
-//
-//	while(1){
-//		PRINTF("About to send data\n\r");
-//UART_DRV_SendDataBlocking(1, AT, sizeof(AT),16000u); // function
-////	UART_DRV_ReceiveDataBlocking(1, &TXBUFF, 2,16000); // function
-////	 PRINTF("\n\rWho am i register value is: %01X", TXBUFF[0]);
-//
-//	//PRINTF()
-//	PRINTF("Tried to sent some\n");
-//
-//	}
 
 	//Uart config
 	uart_state_t uartState1; // user provides memory for the driver state structure
