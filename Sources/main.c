@@ -4,7 +4,7 @@
  * Main project Year 5
  * SLATAV main code for kl26z
  *
- *During Development
+ *Working i2c with UART1 and UART2 interrupt
  */
 ///////////////////////////////////////////////////////////////////////////////
 // Includes
