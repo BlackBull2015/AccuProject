@@ -28,10 +28,15 @@
 // Code
 ///////////////////////////////////////////////////////////////////////////////
 
-//void UART1_IRQHandler(void)
-//{
-//	UART_DRV_IRQHandler(1);
-//}
+void UART1_IRQHandler(void)
+{
+	UART_DRV_IRQHandler(1);
+}
+
+char left[] = "LEFT";
+char right[] = "RIGHT";
+char front[] = "FRONT";
+char back[] = "BACK";
 int main(void)
 {
 
@@ -69,6 +74,14 @@ int main(void)
 //
 //	}
 
+	//Uart config
+	uart_state_t uartState1; // user provides memory for the driver state structure
+	uart_user_config_t uartConfig1;
+	uartConfig1.baudRate = 9600;
+	uartConfig1.bitCountPerChar = kUart8BitsPerChar;
+	uartConfig1.parityMode = kUartParityDisabled;
+	uartConfig1.stopBitCount = kUartOneStopBit;
+
 
 	//Accu init
     i2c_master_state_t master;
@@ -78,7 +91,8 @@ int main(void)
       .baudRate_kbps = 400   // 400 Kbps
     };
     hardware_init();
-    UART2_config(9600);
+    configure_uart_pins(0);
+   UART2_config(9600);
     enable_UART2_receive_interrupt();
     i2cinitreg();
 
@@ -88,6 +102,7 @@ int main(void)
     // Initialize i2c master
     I2C_DRV_MasterInit(I2C_INSTANCE_0, &master);
     configureAccuAndMag(device);
+    UART_DRV_Init(1,  &uartState1, &uartConfig1);
 
     PRINTF("\r\n==================== I2C MASTER BLOCKING ===================\r\n");
     PRINTF("\r\n1. Master checks who am i register\
@@ -142,14 +157,18 @@ void getWhere(int x, int y){
 
 	if(y>0+TRESHOLD){
 		PRINTF("RIGHT ");
+		UART_DRV_SendDataBlocking(1, right, sizeof(right),16000u); // function
 	}else if(y<0-TRESHOLD){
 		PRINTF("LEFT ");
+		UART_DRV_SendDataBlocking(1, left, sizeof(left),16000u); // function
 	}
 
 	if(x>0+TRESHOLD){
 		PRINTF(" BACK ");
+		UART_DRV_SendDataBlocking(1, back, sizeof(back),16000u); // function
 	}else if(x<0-TRESHOLD){
 		PRINTF(" FRONT ");
+		UART_DRV_SendDataBlocking(1, front, sizeof(front),16000u); // function
 	}
 
 	}
