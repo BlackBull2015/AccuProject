@@ -119,18 +119,18 @@ void getWhere(int x, int y){
 
 	if(y>0+TRESHOLD){
 		PRINTF("RIGHT ");
-		UART_DRV_SendDataBlocking(1, right, sizeof(right),16000u); // function
+		UART_DRV_SendDataBlocking(1, CommandsMicro[12], sizeof(CommandsMicro[12]),16000u); // function
 	}else if(y<0-TRESHOLD){
 		PRINTF("LEFT ");
-		UART_DRV_SendDataBlocking(1, left, sizeof(left),16000u); // function
+		UART_DRV_SendDataBlocking(1, CommandsMicro[11], sizeof(CommandsMicro[11]),16000u); // function
 	}
 
 	if(x>0+TRESHOLD){
 		PRINTF(" BACK ");
-		UART_DRV_SendDataBlocking(1, back, sizeof(back),16000u); // function
+		UART_DRV_SendDataBlocking(1, CommandsMicro[13], sizeof(CommandsMicro[13]),16000u); // function
 	}else if(x<0-TRESHOLD){
 		PRINTF(" FRONT ");
-		UART_DRV_SendDataBlocking(1, front, sizeof(front),16000u); // function
+		UART_DRV_SendDataBlocking(1, CommandsMicro[14], sizeof(CommandsMicro[14]),16000u); // function
 	}
 
 	}
@@ -169,11 +169,12 @@ void UART2_IRQHandler(void)
     	else{
     		size = BufferStage;
     		BufferStage = 0;
-    		for(count = 0;count < size; count ++){
-    			PUTCHAR(CommandBuffer[BufferStage++]);
-    		}
-    		BufferStage = 0;
-    		memset(CommandBuffer,0,sizeof(CommandBuffer));
+    		CheckCommandAndSentIt(CommandBuffer);
+    	//	for(count = 0;count < size; count ++){
+    	//		PUTCHAR(CommandBuffer[BufferStage++]);
+    	//	}
+    	//	BufferStage = 0;
+    	//	memset(CommandBuffer,0,sizeof(CommandBuffer));
     	}
     //	PUTCHAR(UART2_D);	//Test for sending all characters
     }
@@ -221,7 +222,21 @@ void put_char(char c)
 	{}
 	UART2_D = c;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Function to transmit a cmmande recived from bluetooth modeule and transfered to micro
+///////////////////////////////////////////////////////////////////////////////
+void CheckCommandAndSentIt(char* buffer){
 
+	int loop,index;
+	char* cmd;
+
+	for(loop = 0; loop < 10; loop++){
+		if(strcmp(CommandsBlue[loop],buffer) == 0){
+			index = loop;
+		}
+	}
+	UART_DRV_SendDataBlocking(1, CommandsMicro[index], sizeof(CommandsMicro[index]),16000u); // function
+}
 ///////////////////////////////////////////////////////////////////////////////
 // EOF
 ///////////////////////////////////////////////////////////////////////////////

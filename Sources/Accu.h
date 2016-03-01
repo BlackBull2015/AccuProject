@@ -17,6 +17,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 void i2cinitreg();
 void getWhere(int x, int y);
+void CheckCommandAndSentIt(char* buffer);
 
 int x,y,z,count, magnet;
 
