@@ -49,16 +49,4 @@ char* CommandsMicro[14] = {"LEFT","RIGHT","FORWARD","BACK","LEVELIT"
 #define ACCURIGHT 12//Reading from accelerometer that right side is lifted
 #define ACCUBACK 13	//Reading from accelerometer that back is lifted
 #define ACCUFRONT 14//Reading from accelerometer that front is lifted
-
-
-
-
-
-
-
-char left[] = "LEFT";
-char right[] = "RIGHT";
-char front[] = "FRONT";
-char back[] = "BACK";
-
 #endif

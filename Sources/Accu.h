@@ -19,16 +19,20 @@ void i2cinitreg();
 void getWhere(int x, int y);
 void CheckCommandAndSentIt(char* buffer);
 
-int x,y,z,count, magnet;
+int x,y,z,count,tmp;
+double magnet,mx,mz,my;
 
 // Buffer store data to receive from slave
 uint8_t rxBuff[DATA_LENGTH] = {0};
+uint8_t tempBuf[1];
 
 //Test Register for who am i
 uint8_t WHO_AM_I[1] = {0x0D};
 
 //Read Register Data status
 uint8_t READ_DATA[1] = {0x00};
+uint8_t READ_TEMP[1] = {0x51};
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

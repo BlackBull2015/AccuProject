@@ -4,7 +4,7 @@
  * Main project Year 5
  * SLATAV main code for kl26z
  *
- *Working i2c with UART1 and UART2 interrupt
+ *Working i2c with UART1 and UART2 interrupt also passing commands to arduino
  */
 ///////////////////////////////////////////////////////////////////////////////
 // Includes
@@ -22,6 +22,7 @@
 #include "fsl_uart_driver.h"
 #include "UART2_Interrupt.h"
 #include "Commands_dec.h"
+#include <math.h>
 //#include "fsl_uart.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,16 +82,32 @@ int main(void)
     	 x = 0;
     	 y = 0;
     	 z = 0;
-    	 for(count = 0; count < 200; count++){
+    //	 for(count = 0; count < 200; count++){
     		 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
+    		 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_TEMP, 1, tempBuf, 1, 1000);
 
-    		     	 x += (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
-    		     	 y += (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
-    		     	 z += (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
-    	 }
-    	 x = x/200;
-    	 y = y/200;
-    	 getWhere(x,y);
+    		 	 	 tmp = tempBuf[0];
+
+    		     	 x = (int16_t)(((rxBuff[1] << 8) | rxBuff[2]))>> 2;
+    		     	 y = (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
+    		     	 z = (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
+
+    		     	 mx = (double)((rxBuff[7] << 8) | rxBuff[8]);
+    		     	 my = (double)((rxBuff[9] << 8) | rxBuff[10]);
+    		     	 mz = (double)((rxBuff[11] << 8) | rxBuff[12]);
+
+    		     	 my = my/10;
+    		     	 mx = mx/10;
+
+    		     	 	magnet = (double)atan2(my, mx);
+    		     	 	magnet = magnet * 180/3.14159265358979323846;
+    	//	     	 PRINTF("\rAccu is: x=%06i y=%06i z=%06i  Max is: %06i",x,y,z,magnet);
+    //	 }
+   // 	 x = x/200;
+   // 	 y = y/200;
+   // 	 magnet = magnet/200;
+    	 PRINTF("\rAccu is: x=%06i y=%06i  Mag is: %i and tmp is: %i ",x,y,(int16_t)magnet,tmp);
+   // 	 getWhere(x,y);
      }
 
     PRINTF("\r\n==================== I2C MASTER FINISH =================== \r\n");
@@ -226,7 +243,6 @@ void put_char(char c)
 // Function to transmit a cmmande recived from bluetooth modeule and transfered to micro
 ///////////////////////////////////////////////////////////////////////////////
 void CheckCommandAndSentIt(char* buffer){
-
 	int loop,index;
 	char* cmd;
 
@@ -236,6 +252,7 @@ void CheckCommandAndSentIt(char* buffer){
 		}
 	}
 	UART_DRV_SendDataBlocking(1, CommandsMicro[index], sizeof(CommandsMicro[index]),16000u); // function
+	memset(CommandBuffer,0,sizeof(CommandBuffer));
 }
 ///////////////////////////////////////////////////////////////////////////////
 // EOF
