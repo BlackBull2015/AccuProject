@@ -25,6 +25,10 @@
 #include <math.h>
 //#include "fsl_uart.h"
 
+#define PERIPHERAL_BUS_FREQUENCY 12000000
+
+void PIT_delay(float time_delay_secs);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Code
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,22 +96,23 @@ int main(void)
     		     	 y = (int16_t)(((rxBuff[3] << 8) | rxBuff[4]))>> 2;
     		     	 z = (int16_t)(((rxBuff[5] << 8) | rxBuff[6]))>> 2;
 
-    		     	 mx = (double)((rxBuff[7] << 8) | rxBuff[8]);
-    		     	 my = (double)((rxBuff[9] << 8) | rxBuff[10]);
-    		     	 mz = (double)((rxBuff[11] << 8) | rxBuff[12]);
+    		     	 mx = (int16_t)((rxBuff[7] << 8) | rxBuff[8]);
+    		     	 my = (int16_t)((rxBuff[9] << 8) | rxBuff[10]);
+    		     	 mz = (int16_t)((rxBuff[11] << 8) | rxBuff[12]);
 
     		     	 my = my/10;
     		     	 mx = mx/10;
 
-    		     	 	magnet = (double)atan2(my, mx);
-    		     	 	magnet = magnet * 180/3.14159265358979323846;
+    		     	 	//magnet = (double)atan2(my, mx);
+    		     	 	//magnet = magnet * 180/3.14159265358979323846;
     	//	     	 PRINTF("\rAccu is: x=%06i y=%06i z=%06i  Max is: %06i",x,y,z,magnet);
     //	 }
    // 	 x = x/200;
    // 	 y = y/200;
    // 	 magnet = magnet/200;
-    	 PRINTF("\rAccu is: x=%06i y=%06i  Mag is: %i and tmp is: %i ",x,y,(int16_t)magnet,tmp);
+    	 PRINTF("\n\raccu is: x=%06i y=%06i  Mag is: %i : %i and tmp is: %i ",x,y,mx,my,tmp);
    // 	 getWhere(x,y);
+    	 PIT_delay(0.5);
      }
 
     PRINTF("\r\n==================== I2C MASTER FINISH =================== \r\n");
@@ -254,6 +259,29 @@ void CheckCommandAndSentIt(char* buffer){
 	UART_DRV_SendDataBlocking(1, CommandsMicro[index], sizeof(CommandsMicro[index]),16000u); // function
 	memset(CommandBuffer,0,sizeof(CommandBuffer));
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// PIT delay
+///////////////////////////////////////////////////////////////////////////////
+void PIT_delay(float time_delay_secs)
+{
+	unsigned long reload_value = (unsigned long)(PERIPHERAL_BUS_FREQUENCY * time_delay_secs);
+
+	//Enable PIT peripheral clock
+	SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;
+
+	//Configure PIT
+	PIT_MCR = 0x01ul;		//PIT timer clock enabled
+	PIT_TCTRL0 = 0;			//timer disabled and interrupt turned off
+	PIT_TFLG0 = 0x01ul;		//Clear interrupt flag
+	PIT_LDVAL0 = reload_value;	//time is calculated from parameter passed to function
+	PIT_TCTRL0 |= 0x01ul;	//enable timer
+	while(PIT_TFLG0==0)	//wait for timer overflow flag
+	{}
+	PIT_TFLG0 = 0x01u;	//Clear interrupt flag
+	PIT_TCTRL0 = 0;		//timer disabled
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // EOF
 ///////////////////////////////////////////////////////////////////////////////

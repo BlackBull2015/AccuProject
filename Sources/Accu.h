@@ -20,7 +20,7 @@ void getWhere(int x, int y);
 void CheckCommandAndSentIt(char* buffer);
 
 int x,y,z,count,tmp;
-double magnet,mx,mz,my;
+int magnet,mx,mz,my;
 
 // Buffer store data to receive from slave
 uint8_t rxBuff[DATA_LENGTH] = {0};
