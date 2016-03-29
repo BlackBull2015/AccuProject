@@ -41,7 +41,7 @@ void UART1_IRQHandler(void)
 int main(void)
 {
 
-	char stringToSend[70];
+	char stringToSend[74];
 	//Uart config
 	uart_state_t uartState1; // user provides memory for the driver state structure
 	uart_user_config_t uartConfig1;
@@ -112,7 +112,7 @@ int main(void)
    // 	 y = y/200;
    // 	 magnet = magnet/200;
     		     	 memset(stringToSend,0,sizeof(stringToSend));
-    	sprintf(stringToSend,"AC: x= %06i y= %06i z= %06i Mag: x= %03i y= %03i z= %03i Tmp: %02i \n",x,y,z,mx,my,mz,tmp);
+    	sprintf(stringToSend,"AC: x= %06i y= %06i z= %06i Mag: x= %03i y= %03i z= %03i Tmp: %02i end",x,y,z,mx,my,mz,tmp);
     	 PRINTF("\n\raccu is: x=%06i y=%06i  Mag is: %i : %i and tmp is: %i ",x,y,mx,my,tmp);
    // 	 getWhere(x,y);
     	 UART_DRV_SendDataBlocking(1, stringToSend, sizeof(stringToSend),16000u);
