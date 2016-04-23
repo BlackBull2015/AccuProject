@@ -35,6 +35,16 @@ uint8_t READ_TEMP[1] = {0x51};
 
 
 
+
+uint8_t MOFF_X_MSB_REG	={0x3F};		// MSB of magnetometer of X-axis offset
+uint8_t MOFF_X_LSB_REG	={0x40};		// LSB of magnetometer of X-axis offset
+uint8_t MOFF_Y_MSB_REG	={0x41};		// MSB of magnetometer of Y-axis offset
+uint8_t MOFF_Y_LSB_REG	={0x42};		// LSB of magnetometer of Y-axis offset
+uint8_t MOFF_Z_MSB_REG	={0x43};		// MSB of magnetometer of Z-axis offset
+uint8_t MOFF_Z_LSB_REG  ={0x44};		// LSB of magnetometer of Z-axis offset
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Register addresses
 ///////////////////////////////////////////////////////////////////////////////

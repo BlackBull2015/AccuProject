@@ -29,6 +29,14 @@
 
 void PIT_delay(float time_delay_secs);
 
+i2c_device_t device =
+   {
+     .address = 0x1DU,
+     .baudRate_kbps = 400   // 400 Kbps
+   };
+int16_t tempBufX[1];
+int16_t tempBufY[1];
+int16_t tempBufZ[1];
 ///////////////////////////////////////////////////////////////////////////////
 // Code
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,11 +61,7 @@ int main(void)
 
 	//Accu init
     i2c_master_state_t master;
-    i2c_device_t device =
-    {
-      .address = 0x1DU,
-      .baudRate_kbps = 400   // 400 Kbps
-    };
+
     hardware_init();
     configure_uart_pins(0);
    UART2_config(9600);
@@ -78,11 +82,14 @@ int main(void)
     \r\n3. Takes 200 samples, average them and displays results\r\n");
     PRINTF("\r\n============================================================\r\n\n");
 
-    PRINTF("Press any key to start transfer:\r\n\n");
-    GETCHAR();
+  //  PRINTF("Press any to calibrate magnetometer:\r\n\n");
+ //   GETCHAR();
 
-
+	 //FXOS8700CQ_Mag_Calibration();
+	 PRINTF("Calibration completed press key to start:r\n\n");
+	 GETCHAR();
      while(1){
+
 
     	 x = 0;
     	 y = 0;
@@ -101,6 +108,7 @@ int main(void)
     		     	 my = (int16_t)((rxBuff[9] << 8) | rxBuff[10]);
     		     	 mz = (int16_t)((rxBuff[11] << 8) | rxBuff[12]);
 
+    		     	 //make data smaller, easier to work with no influance on readings
     		     	 my = my/10;
     		     	 mx = mx/10;
 
@@ -183,6 +191,90 @@ void configureAccuAndMag(struct i2c_device_t *device){
 
 
 }
+
+void FXOS8700CQ_Mag_Calibration (void)
+{
+	int16_t Xout_Mag_16_bit_avg, Yout_Mag_16_bit_avg, Zout_Mag_16_bit_avg ,Zout_Mag_16_bit;
+	int16_t Xout_Mag_16_bit_max, Yout_Mag_16_bit_max, Zout_Mag_16_bit_max, Yout_Mag_16_bit;
+	int16_t Xout_Mag_16_bit_min, Yout_Mag_16_bit_min, Zout_Mag_16_bit_min ,Xout_Mag_16_bit;
+     int i = 0;
+
+
+         while (i < 94)             // This takes ~30s (94 samples * 1/3.125)
+ //            while (i < 20)             // This takes ~30s (94 samples * 1/3.125)
+     {
+        	  PRINTF("%i\r\n",i);
+        	 I2C_DRV_MasterReceiveDataBlocking(I2C_INSTANCE_0, &device,READ_DATA, 1, rxBuff, 13, 1000);
+          //   I2C_ReadMultiRegisters(FXOS8700CQ_I2C_ADDRESS, MOUT_X_MSB_REG, 6, AccelMagData);         // Read data output registers 0x33 - 0x38
+
+             Xout_Mag_16_bit = (int16_t)((rxBuff[7] << 8) | rxBuff[8]);
+             Yout_Mag_16_bit = (int16_t)((rxBuff[9] << 8) | rxBuff[10]);
+             Zout_Mag_16_bit = (int16_t)((rxBuff[11] << 8) | rxBuff[12]);
+
+
+                       // Assign first sample to maximum and minimum values
+             if (i == 0)
+             {
+                  Xout_Mag_16_bit_max = Xout_Mag_16_bit;
+                  Xout_Mag_16_bit_min = Xout_Mag_16_bit;
+
+                  Yout_Mag_16_bit_max = Yout_Mag_16_bit;
+                  Yout_Mag_16_bit_min = Yout_Mag_16_bit;
+
+                  Zout_Mag_16_bit_max = Zout_Mag_16_bit;
+                  Zout_Mag_16_bit_min = Zout_Mag_16_bit;
+             }
+
+                      // Check to see if current sample is the maximum or minimum X-axis value
+                      if (Xout_Mag_16_bit > Xout_Mag_16_bit_max)    {Xout_Mag_16_bit_max = Xout_Mag_16_bit;}
+                      if (Xout_Mag_16_bit < Xout_Mag_16_bit_min)    {Xout_Mag_16_bit_min = Xout_Mag_16_bit;}
+
+                      // Check to see if current sample is the maximum or minimum Y-axis value
+                      if (Yout_Mag_16_bit > Yout_Mag_16_bit_max)    {Yout_Mag_16_bit_max = Yout_Mag_16_bit;}
+                      if (Yout_Mag_16_bit < Yout_Mag_16_bit_min)    {Yout_Mag_16_bit_min = Yout_Mag_16_bit;}
+
+                      // Check to see if current sample is the maximum or minimum Z-axis value
+                      if (Zout_Mag_16_bit > Zout_Mag_16_bit_max)    {Zout_Mag_16_bit_max = Zout_Mag_16_bit;}
+                      if (Zout_Mag_16_bit < Zout_Mag_16_bit_min)    {Zout_Mag_16_bit_min = Zout_Mag_16_bit;}
+
+             i++;
+             PIT_delay(0.25);
+     }
+
+     Xout_Mag_16_bit_avg = (Xout_Mag_16_bit_max + Xout_Mag_16_bit_min) / 2;            // X-axis hard-iron offset
+     Yout_Mag_16_bit_avg = (Yout_Mag_16_bit_max + Yout_Mag_16_bit_min) / 2;            // Y-axis hard-iron offset
+     Zout_Mag_16_bit_avg = (Zout_Mag_16_bit_max + Zout_Mag_16_bit_min) / 2;            // Z-axis hard-iron offset
+
+     // Left-shift by one as magnetometer offset registers are 15-bit only, left justified
+     Xout_Mag_16_bit_avg <<= 1;
+     Yout_Mag_16_bit_avg <<= 1;
+      Zout_Mag_16_bit_avg <<= 1;
+
+      tempBufX[0] = Xout_Mag_16_bit_avg;
+      tempBufY[0] = Yout_Mag_16_bit_avg;
+      tempBufZ[0]  = Zout_Mag_16_bit_avg;
+      PRINTF("to send\r\n");
+  	//Stendby On
+  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,ACCU_CTR_1, 1, STN_ON, 1, 1000);
+  	 PRINTF("stb\r\n");
+  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MOFF_X_LSB_REG, 1, tempBufX[0] & 0xFF, 1, 1000);
+  	 PRINTF("first\r\n");
+  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MOFF_X_MSB_REG, 1, (tempBufX[0] >> 8) & 0xFF, 1,1000);
+	 PRINTF("second\r\n");
+  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MOFF_Y_LSB_REG, 1, tempBufY[0] & 0xFF, 1, 1000);
+	 PRINTF("third\r\n");
+	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MOFF_Z_LSB_REG, 1, tempBufZ[0] & 0xFF, 1, 1000);
+  	PRINTF("fifth\r\n");
+  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MOFF_Z_MSB_REG, 1, (tempBufZ[0] >> 8) & 0xFF, 1, 1000);
+	 PRINTF("all\r\n");
+//	  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,MOFF_Y_MSB_REG, 1, tempBufY[0] >> 8, 1, 1000);
+//	  	PRINTF("fourth\r\n");
+
+
+  	I2C_DRV_MasterSendDataBlocking(I2C_INSTANCE_0, &device,ACCU_CTR_1, 1, STN_OFF, 1, 1000);
+	 PRINTF("sent all\r\n");
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // UART2 Interrupt Handler Echos received character
 /////////////////////////////////////////////////////////////////////////////
